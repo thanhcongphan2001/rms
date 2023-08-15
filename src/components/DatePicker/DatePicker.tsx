@@ -5,7 +5,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 // import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker'
 import { TextField } from '@mui/material'
-import DatePicker from '@mui/lab/DatePicker'
+// import DatePicker from '@mui/lab/DatePicker'
 import styled from 'styled-components'
 // import dayjs from "dayjs";
 import * as React from 'react'
@@ -39,7 +39,7 @@ const DatePickerCus = ({ Title, handleChange, name, value = null }: any) => {
             console.log(newValue)
           }}
           className='date'
-          renderInput={(params) => <CustomTextField size='small' {...props} />}
+          renderInput={(params) => <CustomTextField size='small' />}
         />
       </LocalizationProvider>
     </>
