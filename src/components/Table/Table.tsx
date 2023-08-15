@@ -1,10 +1,28 @@
 import React, { useState } from 'react'
 import { Table, Row, Col } from 'antd'
 import ModalCus from '../Modal/Modal'
+import resourceManagementSystem from 'src/apis/resourceManagementSystem.api'
+import { useQuery } from '@tanstack/react-query'
 
 // https://stackblitz.com/run?file=demo.tsx
 const TableCus = () => {
   const [open, setOpen] = useState(false)
+  const [current, setCurrent] = useState(1)
+  const [pageSize, setpageSize] = useState(5)
+  const [total, setTotal] = useState(0)
+  const { data: List } = useQuery({
+    queryKey: ['List ', { current, pageSize, total }],
+    queryFn: () => {
+      const query = { current, pageSize }
+      return resourceManagementSystem.getList(query)
+    },
+    keepPreviousData: true,
+    staleTime: 3 * 60 * 1000,
+    onSuccess: (data) => {
+      // Update the total value here based on the received data
+      setTotal(data.paging.total)
+    }
+  })
   const columns = [
     {
       title: 'ID',
@@ -14,6 +32,8 @@ const TableCus = () => {
         <a
           className='text-blue-600'
           onClick={() => {
+            console.log(record.id)
+
             handleRowClick(record)
             setOpen(true)
           }}
@@ -53,6 +73,22 @@ const TableCus = () => {
       sorter: true
     }
   ]
+  const dataa = List?.data.map((data) => {
+    return {
+      key: data.id,
+      id: data.id,
+      name: data.fullName,
+      yoe: data?.specs.expYears,
+      rank: data?.specs.level.title,
+      location: data?.position,
+      programmingLanguage: data?.specs?.codeLangs
+        .map((data) => {
+          return data.name
+        })
+        .join(' ,'),
+      skill: data?.specs?.techStack
+    }
+  })
 
   const data = [
     {
@@ -88,6 +124,12 @@ const TableCus = () => {
   ]
 
   const onChange = (pagination, filters, sorter, extra) => {
+    if (pagination && pagination.current !== current) {
+      setCurrent(pagination.current)
+    }
+    if (pagination && pagination.pageSize !== pageSize) {
+      setpageSize(pagination.pageSize)
+    }
     console.log('params', pagination, filters, sorter, extra)
   }
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
@@ -138,12 +180,27 @@ const TableCus = () => {
   }
   return (
     <>
-      <Row gutter={[20, 20]} className='mt-4'>
-        <Col span={24}>
-          <Table columns={columns} dataSource={data} onChange={onChange} rowSelection={rowSelection} />
-        </Col>
-      </Row>
-      <ModalCus open={open} setOpen={setOpen} />
+      {List && (
+        <>
+          <Row gutter={[20, 20]} className='mt-4'>
+            <Col span={24}>
+              <Table
+                columns={columns}
+                dataSource={dataa}
+                onChange={onChange}
+                rowSelection={rowSelection}
+                pagination={{
+                  current: current,
+                  pageSize: pageSize,
+                  showSizeChanger: true,
+                  total: total
+                }}
+              />
+            </Col>
+          </Row>
+          <ModalCus open={open} setOpen={setOpen} />
+        </>
+      )}
     </>
   )
 }

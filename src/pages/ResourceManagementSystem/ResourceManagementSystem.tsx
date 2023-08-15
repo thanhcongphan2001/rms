@@ -1,13 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 // Không có tính năng tree-shaking
 // import { omit } from 'lodash'
 
 // Import chỉ mỗi function omit
 import omit from 'lodash/omit'
-import { TextField } from '@mui/material'
+
 import { schema, Schema } from 'src/utils/rules'
 import Input from 'src/components/Input'
 import authApi from 'src/apis/auth.api'
@@ -21,11 +21,15 @@ import { Helmet } from 'react-helmet-async'
 import { Row, Col } from 'antd'
 import { styled } from '@mui/material/styles'
 import DatePickerCus from 'src/components/DatePicker'
-import { Select, MenuItem } from '@mui/material'
+import { Select, MenuItem, ListItemText, Checkbox, OutlinedInput, TextField } from '@mui/material'
 import FormControl from '@mui/material/FormControl'
 import TableCus from 'src/components/Table'
 import Icon, { HomeOutlined } from '@ant-design/icons'
+import useQueryConfig from 'src/hooks/useQueryConfig'
+import resourceManagementSystem from 'src/apis/resourceManagementSystem.api'
+
 type FormData = Pick<Schema, 'email' | 'password' | 'confirm_password'>
+
 const registerSchema = schema.pick(['email', 'password', 'confirm_password'])
 const CustomTextField = styled(TextField)({
   width: '90%',
@@ -48,15 +52,47 @@ const CustomTextField = styled(TextField)({
     padding: '0 4px'
   }
 })
-
+const ITEM_HEIGHT = 48
+const ITEM_PADDING_TOP = 8
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250
+    }
+  }
+}
 export default function ResourceManagementSystem() {
   const [selectedOption, setSelectedOption] = useState('option1')
+  const [personName, setPersonName] = useState([])
+
+  const queryConfig = useQueryConfig()
+
+  const { data: masterData } = useQuery({
+    queryKey: ['masterData', queryConfig],
+    queryFn: () => {
+      return resourceManagementSystem.getAll()
+    },
+    keepPreviousData: true,
+    staleTime: 3 * 60 * 1000
+  })
 
   const handleChange = (event: any) => {
     setSelectedOption(event.target.value)
   }
-  console.log(selectedOption)
-
+  const handleChangeName = (event) => {
+    const {
+      target: { value }
+    } = event
+    setPersonName(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value
+    )
+  }
+  const names = masterData && masterData[3].data.map((data) => data.name)
+  if (!masterData) {
+    return null
+  }
   return (
     <div className=''>
       <Helmet>
@@ -112,6 +148,23 @@ export default function ResourceManagementSystem() {
           </Row>
           <Row className='mt-4'>
             <Col span={4}>
+              <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
+                <Select value={selectedOption} onChange={handleChange}>
+                  <MenuItem value='option1' className='pb-2'>
+                    Quốc tịch
+                  </MenuItem>
+                  {masterData &&
+                    masterData[4].data.map((data: any) => {
+                      return (
+                        <MenuItem value={data.id} className='pb-2' key={data.id}>
+                          {data.name}
+                        </MenuItem>
+                      )
+                    })}
+                </Select>
+              </FormControl>
+            </Col>
+            <Col span={4}>
               <DatePickerCus Title='Ngày onboard' />
             </Col>
           </Row>
@@ -127,6 +180,14 @@ export default function ResourceManagementSystem() {
                   <MenuItem value='option1' className='pb-2'>
                     Vị trí
                   </MenuItem>
+                  {masterData &&
+                    masterData[2].data.map((data: any) => {
+                      return (
+                        <MenuItem value={data.id} className='pb-2' key={data.id}>
+                          {data.title}
+                        </MenuItem>
+                      )
+                    })}
                 </Select>
               </FormControl>
             </Col>
@@ -136,6 +197,14 @@ export default function ResourceManagementSystem() {
                   <MenuItem value='option1' className='pb-2'>
                     Cấp bậc
                   </MenuItem>
+                  {masterData &&
+                    masterData[1].data.map((data: any) => {
+                      return (
+                        <MenuItem value={data.id} className='pb-2' key={data.id}>
+                          {data.title}
+                        </MenuItem>
+                      )
+                    })}
                 </Select>
               </FormControl>
             </Col>
@@ -147,13 +216,40 @@ export default function ResourceManagementSystem() {
               <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
                 <Select value={selectedOption} onChange={handleChange}>
                   <MenuItem value='option1' className='pb-2'>
-                    ngoại ngữ
+                    Ngoại ngữ
                   </MenuItem>
+                  {masterData &&
+                    masterData[0].data.map((data: any) => {
+                      return (
+                        <MenuItem value={data.id} className='pb-2' key={data.id}>
+                          {data.name}
+                        </MenuItem>
+                      )
+                    })}
                 </Select>
               </FormControl>
             </Col>
             <Col span={4}>
-              <CustomTextField id='outlined-basic' label='Ngôn ngữ lập trình' variant='outlined' size='small' />
+              <FormControl sx={{ width: '90%' }} size='small' className='bg-white'>
+                <InputLabel id='demo-multiple-checkbox-label'>Ngôn ngữ lập trình</InputLabel>
+                <Select
+                  labelId='demo-multiple-checkbox-label'
+                  id='demo-multiple-checkbox'
+                  multiple
+                  value={personName}
+                  onChange={handleChangeName}
+                  input={<OutlinedInput label='Tag' />}
+                  renderValue={(selected) => selected.join(', ')}
+                  MenuProps={MenuProps}
+                >
+                  {names.map((name) => (
+                    <MenuItem key={name} value={name}>
+                      <Checkbox checked={personName.indexOf(name) > -1} />
+                      <ListItemText primary={name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Col>
             <Col span={4}>
               <CustomTextField id='outlined-basic' label='Bộ kỹ năng' variant='outlined' size='small' />
