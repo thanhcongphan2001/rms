@@ -35,11 +35,13 @@ const DatePickerCus = ({ Title, handleChange, name, value = null }: any) => {
         <CustomMobileDatePicker
           label={Title}
           value={value}
-          onChange={(newValue) => {
+          onChange={(newValue: any) => {
+            console.log('dấdsa')
+
             console.log(newValue)
           }}
           className='date'
-          renderInput={(params: any) => <CustomTextField size='small' />}
+          // renderInput={(params: any) => <CustomTextField size='small' {...params} />}
         />
       </LocalizationProvider>
     </>

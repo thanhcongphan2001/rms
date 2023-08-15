@@ -18,7 +18,7 @@ const TableCus = () => {
     },
     keepPreviousData: true,
     staleTime: 3 * 60 * 1000,
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       // Update the total value here based on the received data
       setTotal(data.paging.total)
     }
@@ -28,8 +28,9 @@ const TableCus = () => {
       title: 'ID',
       dataIndex: 'id',
       sorter: true,
-      render: (text, record) => (
-        <a
+      render: (text: any, record: any) => (
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid
+        <div
           className='text-blue-600'
           onClick={() => {
             console.log(record.id)
@@ -39,7 +40,7 @@ const TableCus = () => {
           }}
         >
           {text}
-        </a>
+        </div>
       )
     },
     {
@@ -123,7 +124,7 @@ const TableCus = () => {
     }
   ]
 
-  const onChange = (pagination, filters, sorter, extra) => {
+  const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
     if (pagination && pagination.current !== current) {
       setCurrent(pagination.current)
     }
@@ -133,7 +134,7 @@ const TableCus = () => {
     console.log('params', pagination, filters, sorter, extra)
   }
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const onSelectChange = (newSelectedRowKeys) => {
+  const onSelectChange = (newSelectedRowKeys: any) => {
     console.log('selectedRowKeys changed: ', newSelectedRowKeys)
     setSelectedRowKeys(newSelectedRowKeys)
   }
@@ -147,9 +148,9 @@ const TableCus = () => {
       {
         key: 'odd',
         text: 'Select Odd Row',
-        onSelect: (changeableRowKeys) => {
+        onSelect: (changeableRowKeys: any) => {
           let newSelectedRowKeys = []
-          newSelectedRowKeys = changeableRowKeys.filter((_, index) => {
+          newSelectedRowKeys = changeableRowKeys.filter((_: any, index: any) => {
             if (index % 2 !== 0) {
               return false
             }

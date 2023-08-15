@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { Button, Modal, Row, Col } from 'antd'
-import DatePickerCus from '../DatePicker/DatePicker'
+import DatePickerCus from '../DatePicker'
 import { TextField } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { Select, MenuItem } from '@mui/material'
@@ -37,8 +37,8 @@ const ModalCus = ({ open, setOpen }: any) => {
   const [listChilds, setListChilds] = useState({
     child1: dataChildDefault
   })
-  const handleChangeInput = (name, value, key) => {
-    let _listChilds = _.cloneDeep(listChilds)
+  const handleChangeInput = (name: any, value: any, key: any) => {
+    const _listChilds = _.cloneDeep(listChilds)
     _listChilds[key][name] = value
     if (value && name === 'url') {
       _listChilds[key]['isValidUrl'] = true
@@ -46,13 +46,13 @@ const ModalCus = ({ open, setOpen }: any) => {
     setListChilds(_listChilds)
   }
   const handleAddNewInput = () => {
-    let _listChilds = _.cloneDeep(listChilds)
+    const _listChilds = _.cloneDeep(listChilds)
     _listChilds[`child-${uuidv4()}`] = dataChildDefault
 
     setListChilds(_listChilds)
   }
-  const handleDeleteInput = (key) => {
-    let _listChilds = _.cloneDeep(listChilds)
+  const handleDeleteInput = (key: any) => {
+    const _listChilds = _.cloneDeep(listChilds)
     delete _listChilds[key]
     setListChilds(_listChilds)
   }
