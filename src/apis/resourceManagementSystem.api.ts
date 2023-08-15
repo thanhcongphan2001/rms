@@ -23,7 +23,7 @@ const resourceManagementSystem = {
   getAll(){
    return Promise.all([this.getLanguages(),this.getlevels(),this.getPositions(),this.getCodeLangs(),this.getlocations()])
   },
-  getList(query){
+  getList(query:any){
     return httpRms.get(`/users?page=${query.current}&size=${query.pageSize}`) 
   }
 }

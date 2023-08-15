@@ -39,7 +39,7 @@ const DatePickerCus = ({ Title, handleChange, name, value = null }: any) => {
             console.log(newValue)
           }}
           className='date'
-          renderInput={(params) => <CustomTextField size='small' />}
+          renderInput={(params: any) => <CustomTextField size='small' />}
         />
       </LocalizationProvider>
     </>
