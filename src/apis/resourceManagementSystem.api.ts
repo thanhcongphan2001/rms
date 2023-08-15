@@ -6,25 +6,28 @@ const URL = 'purchases'
 
 const resourceManagementSystem = {
   getLanguages() {
-    return httpRms.get(`/langs/all`)
+    return httpRms.get(`/user/api/v1/langs/all`)
   },
   getlevels() {
-    return httpRms.get(`/levels/all`)
+    return httpRms.get(`/user/api/v1/levels/all`)
   },
   getPositions() {
-    return httpRms.get(`/positions/all`)
+    return httpRms.get(`/user/api/v1/positions/all`)
   },
   getCodeLangs() {
-    return httpRms.get(`/codeLangs/all`)
+    return httpRms.get(`/user/api/v1/codeLangs/all`)
   },
   getlocations() {
-    return httpRms.get(`/locations/countries`)
+    return httpRms.get(`/user/api/v1/locations/countries`)
   },
   getAll(){
    return Promise.all([this.getLanguages(),this.getlevels(),this.getPositions(),this.getCodeLangs(),this.getlocations()])
   },
   getList(query:any){
-    return httpRms.get(`/users?page=${query.current}&size=${query.pageSize}`) 
+    return httpRms.get(`/user/api/v1/users?page=${query.current}&size=${query.pageSize}`) 
+  },
+  deleteUser(id:any){
+    return httpRms.delete(`/user/api/v1/users/${id}`)
   }
 }
 

@@ -58,9 +58,9 @@ const ModalCus = ({ open, setOpen }: any) => {
   }
   return (
     <>
-      <Button type='primary' onClick={() => setOpen(true)}>
+      {/* <Button type='primary' onClick={() => setOpen(true)}>
         Open Modal of 1000px width
-      </Button>
+      </Button> */}
 
       <Modal
         title={<h1 className='text-3xl font-bold text-gray-800'>Thông tin chi tiết</h1>}

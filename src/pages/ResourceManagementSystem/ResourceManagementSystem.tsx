@@ -104,6 +104,7 @@ export default function ResourceManagementSystem() {
           <h1 className='text-3xl font-bold text-gray-800'>Quản lý nhân sự</h1>
         </Col>
       </Row>
+
       <div className='bg-neutral-100'>
         <div className='container'>
           <Row className='mt-4'>
@@ -124,12 +125,14 @@ export default function ResourceManagementSystem() {
                   <MenuItem value='option1' className='pb-2'>
                     Giới tính
                   </MenuItem>
+
                   <MenuItem value='option12' className='pb-2'>
                     Nam
                   </MenuItem>
                   <MenuItem value='option2' className='pb-2'>
                     Nữ
                   </MenuItem>
+
                   <MenuItem value='option3' className='pb-2'>
                     Khác
                   </MenuItem>

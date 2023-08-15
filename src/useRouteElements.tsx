@@ -13,6 +13,7 @@ import RegisterLayout from './layouts/RegisterLayout'
 import CartLayout from './layouts/CartLayout'
 import UserLayout from './pages/User/layouts/UserLayout'
 import ProjectManagerDetail from './pages/ProjectManagerDetail'
+
 // import ChangePassword from './pages/User/pages/ChangePassword'
 // import HistoryPurchase from './pages/User/pages/HistoryPurchase'
 // import NotFound from './pages/NotFound'
@@ -78,21 +79,17 @@ export default function useRouteElements() {
         {
           path: path.login,
           element: (
-            <RegisterLayout>
-              <Suspense>
-                <Login />
-              </Suspense>
-            </RegisterLayout>
+            <Suspense>
+              <Login />
+            </Suspense>
           )
         },
         {
           path: path.register,
           element: (
-            <RegisterLayout>
-              <Suspense>
-                <Register />
-              </Suspense>
-            </RegisterLayout>
+            <Suspense>
+              <Register />
+            </Suspense>
           )
         }
       ]
@@ -163,7 +160,7 @@ export default function useRouteElements() {
       element: (
         <MainLayout>
           <Suspense>
-            <ProductList />
+            <ResourceManagementSystem />
           </Suspense>
         </MainLayout>
       )

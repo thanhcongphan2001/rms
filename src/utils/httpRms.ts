@@ -33,7 +33,7 @@ export class HttpRms {
     this.refreshToken = getRefreshTokenFromLS()
     this.refreshTokenRequest = null
     this.instance = axios.create({
-      baseURL: 'https://rms-dev.tadalabs.xyz/user/api/v1/',
+      baseURL: 'https://rms-dev.tadalabs.xyz',
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',

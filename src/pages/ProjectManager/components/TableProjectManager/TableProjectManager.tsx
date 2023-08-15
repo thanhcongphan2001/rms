@@ -1,38 +1,55 @@
 import React, { useState } from 'react'
 import { Table, Row, Col } from 'antd'
 import { createSearchParams, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import projectManager from 'src/apis/projectManager.api'
+import { Divider, Space, Tag } from 'antd';
 const TableProjectManager = () => {
   const [open, setOpen] = useState(false)
+  const [current, setCurrent] = useState(1)
+  const [pageSize, setpageSize] = useState(5)
+  const [total, setTotal] = useState(0)
   const navigate = useNavigate()
+  const { data: List, refetch } = useQuery({
+    queryKey: ['ListProjectManager ', { current, pageSize }],
+    queryFn: () => {
+      const query = { current, pageSize }
+      return projectManager.getprojectManager(query)
+    },
+    keepPreviousData: true,
+    // staleTime: 3 * 60 * 1000,
+    onSuccess: (data: any) => {
+      console.log(data);
+
+      setTotal(data.paging.total)
+    }
+  })
   const columns = [
+
     {
-      title: 'ID',
-      dataIndex: 'id',
+      title: 'Mã dự án',
+      dataIndex: 'projectcode',
       sorter: true,
       render: (text, record) => (
-        <a
+        <button
           className='text-blue-600'
           onClick={() => {
             navigate(`/ProjectManager/${text}`)
           }}
         >
           {text}
-        </a>
+        </button>
       )
-    },
-    {
-      title: 'Mã dự án',
-      dataIndex: 'projectcode',
-      sorter: true
     },
     {
       title: 'Tên dự án',
       dataIndex: 'projectname',
       sorter: true
+
     },
     {
       title: 'Loại dự án',
-      dataIndex: 'projecttype',
+      dataIndex: 'projectype',
       sorter: true
     },
     {
@@ -53,47 +70,39 @@ const TableProjectManager = () => {
     {
       title: 'Trạng thái',
       dataIndex: 'status',
-      sorter: true
+      sorter: true,
+      render: (text, record) => (
+        <Space size={[2, 'large']} wrap>
+          <Tag bordered={false} color="processing">
+            {text}
+          </Tag>
+        </Space>
+      )
     }
   ]
 
-  const data = [
-    {
-      key: '1',
-      id: '1',
-      projectcode: 1,
-      projectname: 'RMS',
-      projecttype: 'web',
-      time: '20-11-2021 - 20/11-2023',
-      price: '1 tỷ',
-      probability: '90%',
-      status: 'chưa có'
-    },
-    {
-      key: '2',
-      id: '2',
-      projectcode: '1',
-      projectname: 'RMS',
-      projecttype: 'web',
-      time: '20-11-2021 - 20/11-2023',
-      price: '1 tỷ',
-      probability: '90%',
-      status: 'chưa có'
-    },
-    {
-      key: '3',
-      id: '3',
-      projectcode: '1',
-      projectname: 'RMS',
-      projecttype: 'web',
-      time: '20-11-2021 - 20/11-2023',
-      price: '1 tỷ',
-      probability: '90%',
-      status: 'chưa có'
-    }
-  ]
+  const data = List?.data.map((data) => {
+    return {
+      key: data.id,
 
-  const onChange = (pagination, filters, sorter, extra) => {
+      projectname: data.name,
+      projectype: data.projectType,
+      projectcode: data.id,
+      time: data.startDate + ' - ' + data.endDate,
+      price: data.biddingPackagePrice + ' tỷ',
+      probability: data.probability + ' %',
+      status: data.status
+    }
+  }
+  )
+
+  const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
+    if (pagination && pagination.current !== current) {
+      setCurrent(pagination.current)
+    }
+    if (pagination && pagination.pageSize !== pageSize) {
+      setpageSize(pagination.pageSize)
+    }
     console.log('params', pagination, filters, sorter, extra)
   }
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
@@ -146,8 +155,18 @@ const TableProjectManager = () => {
     <>
       <Row gutter={[20, 20]} className='mt-4'>
         <Col span={24}>
-          <Table columns={columns} dataSource={data} onChange={onChange} rowSelection={rowSelection} />
-        </Col>
+          <Table
+            columns={columns}
+            dataSource={data}
+            onChange={onChange}
+            rowSelection={rowSelection}
+            pagination={{
+              current: current,
+              pageSize: pageSize,
+              showSizeChanger: true,
+              total: total
+            }}
+          />        </Col>
       </Row>
     </>
   )

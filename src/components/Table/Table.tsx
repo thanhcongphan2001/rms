@@ -2,35 +2,61 @@ import React, { useState } from 'react'
 import { Table, Row, Col } from 'antd'
 import ModalCus from '../Modal/Modal'
 import resourceManagementSystem from 'src/apis/resourceManagementSystem.api'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
+import { AiTwotoneDelete, AiTwotoneEdit } from 'react-icons/ai'
+import { Button, Popconfirm } from 'antd';
+import { toast } from 'react-toastify'
 // https://stackblitz.com/run?file=demo.tsx
 const TableCus = () => {
+  const [hasFetchedTotal, setHasFetchedTotal] = useState(false);
   const [open, setOpen] = useState(false)
   const [current, setCurrent] = useState(1)
   const [pageSize, setpageSize] = useState(5)
   const [total, setTotal] = useState(0)
-  const { data: List } = useQuery({
-    queryKey: ['List ', { current, pageSize, total }],
+  const { data: List, refetch } = useQuery({
+    queryKey: ['List ', { current, pageSize }],
     queryFn: () => {
       const query = { current, pageSize }
       return resourceManagementSystem.getList(query)
     },
     keepPreviousData: true,
-    staleTime: 3 * 60 * 1000,
+    // staleTime: 3 * 60 * 1000,
     onSuccess: (data: any) => {
-      // Update the total value here based on the received data
-      setTotal(data.paging.total)
+
+      if (!hasFetchedTotal) {
+        setTotal(data.paging.total);
+        setHasFetchedTotal(true);
+      }
     }
   })
-  const columns = [
+  console.log('render');
+
+  const deleteUser = useMutation({
+    mutationFn: resourceManagementSystem.deleteUser,
+    onSuccess: (data: any) => {
+      refetch()
+      toast.success(data.message, {
+        position: 'top-center',
+        autoClose: 1000
+      })
+
+
+    }
+  })
+  const handleDeleteUser = (id: any) => {
+
+    deleteUser.mutate(id)
+  }
+  const columns: any = [
     {
       title: 'ID',
       dataIndex: 'id',
       sorter: true,
-      render: (text: any, record: any) => (
+      render: (text: any, record: any, index: any) => (
         // eslint-disable-next-line jsx-a11y/anchor-is-valid
-        <div
+
+        <button
           className='text-blue-600'
           onClick={() => {
             console.log(record.id)
@@ -40,7 +66,7 @@ const TableCus = () => {
           }}
         >
           {text}
-        </div>
+        </button>
       )
     },
     {
@@ -72,9 +98,36 @@ const TableCus = () => {
       title: 'Kỹ năng',
       dataIndex: 'skill',
       sorter: true
+    },
+    {
+      title: 'Action',
+      render: (text: any, record: any, index: any) => (
+        <div className='flex'>
+
+          <Popconfirm
+            placement='leftTop'
+            title="Xác nhận xóa User"
+            description={`Bạn có chắc muốn xóa user có ID là ${record.id} ?`}
+            okText={
+              <p className='text-blue-500 hover:text-white'>Xác nhận</p>
+            }
+            onConfirm={() => handleDeleteUser(record.id)}
+            cancelText="Hủy"
+          >
+            <AiTwotoneDelete
+              className='mr-2 cursor-pointer text-red-500'
+              onClick={() => {
+                console.log('hello')
+              }}
+            />
+          </Popconfirm>
+
+          <AiTwotoneEdit className='mr-2 cursor-pointer text-yellow-500' />
+        </div>
+      )
     }
   ]
-  const dataa = List?.data.map((data) => {
+  const data = List?.data.map((data) => {
     return {
       key: data.id,
       id: data.id,
@@ -91,38 +144,7 @@ const TableCus = () => {
     }
   })
 
-  const data = [
-    {
-      key: '1',
-      id: '1',
-      name: 'Nguyễn Văn A',
-      yoe: 2,
-      rank: 'senior',
-      location: 'dev',
-      programmingLanguage: 'Reactjs',
-      skill: 'teamwork'
-    },
-    {
-      key: '2',
-      id: '2',
-      name: 'Nguyễn Văn A',
-      yoe: 2,
-      rank: 'senior',
-      location: 'dev',
-      programmingLanguage: 'Reactjs',
-      skill: 'teamwork'
-    },
-    {
-      key: '3',
-      id: '3',
-      name: 'Nguyễn Văn A',
-      yoe: 2,
-      rank: 'senior',
-      location: 'dev',
-      programmingLanguage: 'Reactjs',
-      skill: 'teamwork'
-    }
-  ]
+
 
   const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
     if (pagination && pagination.current !== current) {
@@ -187,7 +209,7 @@ const TableCus = () => {
             <Col span={24}>
               <Table
                 columns={columns}
-                dataSource={dataa}
+                dataSource={data}
                 onChange={onChange}
                 rowSelection={rowSelection}
                 pagination={{

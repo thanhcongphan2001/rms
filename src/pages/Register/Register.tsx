@@ -1,133 +1,117 @@
-import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { Link, useNavigate } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useMutation } from '@tanstack/react-query'
-// Không có tính năng tree-shaking
-// import { omit } from 'lodash'
-
-// Import chỉ mỗi function omit
-import omit from 'lodash/omit'
-
 import { schema, Schema } from 'src/utils/rules'
-import Input from 'src/components/Input'
+import { useMutation } from '@tanstack/react-query'
 import authApi from 'src/apis/auth.api'
 import { isAxiosUnprocessableEntityError } from 'src/utils/utils'
 import { ErrorResponse } from 'src/types/utils.type'
+// import Input from 'src/components/Input'
 import { useContext } from 'react'
 import { AppContext } from 'src/contexts/app.context'
-import Button from 'src/components/Button'
-import { Helmet } from 'react-helmet-async'
 
-type FormData = Pick<Schema, 'email' | 'password' | 'confirm_password'>
-const registerSchema = schema.pick(['email', 'password', 'confirm_password'])
+// import Button from 'src/components/Button'
+import { Helmet } from 'react-helmet-async'
+import { Button, Form, Input, Radio, Select } from 'antd';
+import { useState } from 'react'
+import { FormControl, MenuItem } from '@mui/material'
+type FormData = Pick<Schema, 'email' | 'password'>
+const loginSchema = schema.pick(['email', 'password'])
 
 export default function Register() {
   const { setIsAuthenticated, setProfile } = useContext(AppContext)
   const navigate = useNavigate()
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const {
     register,
-    handleSubmit,
     setError,
+    handleSubmit,
     formState: { errors }
   } = useForm<FormData>({
-    resolver: yupResolver(registerSchema)
+    resolver: yupResolver(loginSchema)
   })
-  const registerAccountMutation = useMutation({
-    mutationFn: (body: Omit<FormData, 'confirm_password'>) => authApi.registerAccount(body)
+
+  const loginMutation = useMutation({
+    mutationFn: (body: Omit<FormData, 'confirm_password'>) => authApi.login(body)
   })
   const onSubmit = handleSubmit((data) => {
-    const body = omit(data, ['confirm_password'])
-    registerAccountMutation.mutate(body, {
+    loginMutation.mutate(data, {
       onSuccess: (data) => {
         setIsAuthenticated(true)
         setProfile(data.data.data.user)
         navigate('/')
       },
       onError: (error) => {
-        if (isAxiosUnprocessableEntityError<ErrorResponse<Omit<FormData, 'confirm_password'>>>(error)) {
+        if (isAxiosUnprocessableEntityError<ErrorResponse<FormData>>(error)) {
           const formError = error.response?.data.data
           if (formError) {
             Object.keys(formError).forEach((key) => {
-              setError(key as keyof Omit<FormData, 'confirm_password'>, {
-                message: formError[key as keyof Omit<FormData, 'confirm_password'>],
+              setError(key as keyof FormData, {
+                message: formError[key as keyof FormData],
                 type: 'Server'
               })
             })
           }
-          // if (formError?.email) {
-          //   setError('email', {
-          //     message: formError.email,
-          //     type: 'Server'
-          //   })
-          // }
-          // if (formError?.password) {
-          //   setError('password', {
-          //     message: formError.password,
-          //     type: 'Server'
-          //   })
-          // }
         }
       }
     })
   })
-
+  const handleLogin = () => {
+    navigate('/login')
+  }
   return (
-    <div className='bg-orange'>
+    <div className=''>
       <Helmet>
-        <title>Đăng ký | Shopee Clone</title>
-        <meta name='description' content='Đăng ký tài khoản vào dự án Shopee Clone' />
+        <title>Đăng nhập | Shopee Clone</title>
+        <meta name='description' content='Đăng nhập vào dự án Shopee Clone' />
       </Helmet>
-      <div className='container'>
-        <div className='grid grid-cols-1 py-12 lg:grid-cols-5 lg:py-32 lg:pr-10'>
-          <div className='lg:col-span-2 lg:col-start-4'>
-            <form className='rounded bg-white p-10 shadow-sm' onSubmit={onSubmit} noValidate>
-              <div className='text-2xl'>Đăng ký</div>
-              <Input
-                name='email'
-                register={register}
-                type='email'
-                className='mt-8'
-                errorMessage={errors.email?.message}
-                placeholder='Email'
-              />
-              <Input
-                name='password'
-                register={register}
-                type='password'
-                className='mt-2'
-                classNameEye='absolute right-[5px] h-5 w-5 cursor-pointer top-[12px]'
-                errorMessage={errors.password?.message}
-                placeholder='Password'
-                autoComplete='on'
-              />
-
-              <Input
-                name='confirm_password'
-                register={register}
-                type='password'
-                className='mt-2'
-                classNameEye='absolute right-[5px] h-5 w-5 cursor-pointer top-[12px]'
-                errorMessage={errors.confirm_password?.message}
-                placeholder='Confirm Password'
-                autoComplete='on'
-              />
-
-              <div className='mt-2'>
-                <Button
-                  className='flex w-full items-center justify-center bg-red-500 py-4 px-2 text-sm uppercase text-white hover:bg-red-600'
-                  isLoading={registerAccountMutation.isLoading}
-                  disabled={registerAccountMutation.isLoading}
-                >
-                  Đăng ký
+      <div className=''>
+        <div className='grid grid-cols-1 lg:grid-cols-2 h-screen bg-yellow-500'>
+          <div className='lg:col-span-1 bg-white pt-6 px-48'>
+            <Form
+              layout={'vertical'}
+              style={{
+                maxWidth: 600,
+              }}
+            >
+              <p className='mb-4 text-3xl'>Sign Up</p>
+              <Form.Item label="Full name" className='mb-3'>
+                <Input placeholder="Full name" />
+              </Form.Item>
+              <Form.Item label="Email" className='mb-3'>
+                <Input placeholder="Debra.holt@example.com" status="" />
+              </Form.Item>
+              <Form.Item label="Phone number" className='mb-3'>
+                <Input placeholder="Phone number" />
+              </Form.Item>
+              <Form.Item label="Password" className='mb-3'>
+                <Input.Password placeholder="Input password" />
+              </Form.Item >
+              <Form.Item label=" Select your role" className='mb-12'>
+                <FormControl sx={{ minWidth: '100%' }} size='small' className='bg-white'>
+                  <Select value={""}>
+                    <MenuItem value='' className='pb-2'>
+                      Select your role
+                    </MenuItem>
+                    <MenuItem value='option2' className='pb-2'>
+                      Admin
+                    </MenuItem>
+                    <MenuItem value='option3' className='pb-2'>
+                      User
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </Form.Item>
+              <Form.Item>
+                <Button size={'large'} className='bg-yellow-500 text-white w-100' block>
+                  Sign in
                 </Button>
-              </div>
-              <div className='mt-8 flex items-center justify-center'>
-                <span className='text-gray-400'>Bạn đã có tài khoản?</span>
-                <Link className='ml-1 text-red-400' to='/login'>
-                  Đăng nhập
-                </Link>
-              </div>
-            </form>
+              </Form.Item>
+            </Form>
+            <div className='flex'>
+              <p>Have an account ?  </p>
+              <button onClick={handleLogin} className='ml-1 text-yellow-500'>Login</button>
+            </div>
           </div>
         </div>
       </div>

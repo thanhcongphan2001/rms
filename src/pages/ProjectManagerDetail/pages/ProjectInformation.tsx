@@ -4,6 +4,7 @@ import { FormControl, MenuItem, TextField, Select } from '@mui/material'
 import DatePickerCus from 'src/components/DatePicker/DatePicker'
 import { styled } from '@mui/material/styles'
 import TextArea from 'antd/es/input/TextArea'
+import { useParams } from 'react-router-dom'
 const CustomTextField = styled(TextField)({
   width: '90%',
   '& .MuiInputBase-root': {
@@ -15,7 +16,14 @@ const CustomTextField = styled(TextField)({
     },
     '&.Mui-focused': {
       borderColor: '#1890ff'
+    },
+    '&:disabled': {
+      backgroundColor: 'red',
+      borderColor: '#1890ff',
+      fontSize: '32px',
+      pointerEvents: 'none'
     }
+
   },
   '& .Mui-focused .MuiInputLabel-root': {
     top: '-20px',
@@ -25,11 +33,16 @@ const CustomTextField = styled(TextField)({
     padding: '0 4px'
   }
 })
-export default function ProjectInformation() {
+export default function ProjectInformation({ ListProjectManagerDetail }: any) {
   const [selectedOption, setSelectedOption] = useState('option1')
+  console.log(ListProjectManagerDetail);
+
 
   const handleChange = (event: any) => {
     setSelectedOption(event.target.value)
+  }
+  if (!ListProjectManagerDetail) {
+    return null
   }
   return (
     <>
@@ -41,31 +54,35 @@ export default function ProjectInformation() {
 
       <Row className='mt-4'>
         <Col span={4}>
-          <CustomTextField id='outlined-basic' label='Mã dự án' variant='outlined' size='small' name='cc' />
+          <CustomTextField id='outlined-basic' label='Mã dự án' variant='outlined' size='small' name='cc' defaultValue={ListProjectManagerDetail?.data?.id} disabled />
         </Col>
         <Col span={4}>
-          <CustomTextField id='outlined-basic' label='Tên dự án' variant='outlined' size='small' />
+          <CustomTextField id='outlined-basic' label='Tên dự án' variant='outlined' size='small' defaultValue={ListProjectManagerDetail?.data?.name} disabled />
         </Col>
         <Col span={4}>
-          <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
+          {/* <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
             <Select value={selectedOption} onChange={handleChange}>
               <MenuItem value='option1' className='pb-2'>
                 Loại dự án
               </MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
+          <CustomTextField id='outlined-basic' label='Loại dự án' variant='outlined' size='small' defaultValue={ListProjectManagerDetail?.data?.projectType} disabled />
+
         </Col>
         <Col span={4}>
-          <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
+          {/* <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
             <Select value={selectedOption} onChange={handleChange}>
               <MenuItem value='option1' className='pb-2'>
                 Trạng thái dự án
               </MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
+          <CustomTextField id='outlined-basic' label='Trạng thái dự án' variant='outlined' size='small' defaultValue={ListProjectManagerDetail?.data?.status} disabled />
+
         </Col>
         <Col span={4}>
-          <CustomTextField id='outlined-basic' label='Xác suất' variant='outlined' size='small' />
+          <CustomTextField id='outlined-basic' label='Xác suất' variant='outlined' size='small' defaultValue={ListProjectManagerDetail?.data?.probability + '%'} disabled />
         </Col>
         <Col span={4}>
           <DatePickerCus Title='Ngày Tạo' />
@@ -74,35 +91,41 @@ export default function ProjectInformation() {
 
       <Row className='mt-4'>
         <Col span={4}>
-          <CustomTextField id='outlined-basic' label='Khách hàng' variant='outlined' size='small' name='cc' />
+          <CustomTextField id='outlined-basic' label='Khách hàng' variant='outlined' size='small' name='cc' defaultValue={ListProjectManagerDetail?.data?.customer} disabled />
         </Col>
 
         <Col span={4}>
-          <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
+          {/* <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
             <Select value={selectedOption} onChange={handleChange}>
               <MenuItem value='option1' className='pb-2'>
                 Lĩnh vực
               </MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
+          <CustomTextField id='outlined-basic' label='Lĩnh vực' variant='outlined' size='small' name='cc' defaultValue={ListProjectManagerDetail?.data?.domain} disabled />
+
         </Col>
         <Col span={4}>
-          <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
+          {/* <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
             <Select value={selectedOption} onChange={handleChange}>
               <MenuItem value='option1' className='pb-2'>
                 Thị trường
               </MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
+          <CustomTextField id='outlined-basic' label='Lĩnh vực' variant='outlined' size='small' name='cc' defaultValue={ListProjectManagerDetail?.data?.market} disabled />
+
         </Col>
         <Col span={4}>
-          <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
+          {/* <FormControl sx={{ minWidth: '90%' }} size='small' className='bg-white'>
             <Select value={selectedOption} onChange={handleChange}>
               <MenuItem value='option1' className='pb-2'>
                 Hình thức thực hiện
               </MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
+          <CustomTextField id='outlined-basic' label='Lĩnh vực' variant='outlined' size='small' name='cc' defaultValue={ListProjectManagerDetail?.data?.method} disabled />
+
         </Col>
         <Col span={4}>
           <DatePickerCus Title='Ngày bắt đầu' />
@@ -113,17 +136,17 @@ export default function ProjectInformation() {
       </Row>
       <Row className='mt-4'>
         <Col span={24}>
-          <TextArea rows={4} placeholder='Mô tả ' style={{ width: '98.5%' }} />
+          <TextArea rows={4} placeholder='Mô tả ' style={{ width: '98.5%' }} defaultValue={ListProjectManagerDetail?.data?.description} disabled />
         </Col>
       </Row>
       <Row className='mt-8'>
         <Col span={24}>
-          <div className='text-lg font-bold text-gray-800'>Thông tin công nghệ</div>
+          <div className='text-lg font-bold text-gray-800'  >Thông tin công nghệ</div>
         </Col>
       </Row>
       <Row className='mt-4'>
         <Col span={24}>
-          <TextArea rows={4} placeholder='Mô tả ' style={{ width: '98.5%' }} />
+          <TextArea rows={4} placeholder='Mô tả ' style={{ width: '98.5%' }} defaultValue={ListProjectManagerDetail?.data?.devTechStack} disabled />
         </Col>
       </Row>
       <Row className='mt-8'>
